@@ -12,6 +12,7 @@ const DefaultLayout: React.FC = () => {
           <nav className="hidden md:flex items-center gap-6">
             <Link to="/" className="text-sm text-slate-600 hover:text-slate-900">Home</Link>
             <Link to="/products" className="text-sm text-slate-600 hover:text-slate-900">Products</Link>
+            <Link to="/branches" className="text-sm text-slate-600 hover:text-slate-900">Branches</Link>
           </nav>
 
           <div className="flex items-center gap-3">
@@ -26,6 +27,7 @@ const DefaultLayout: React.FC = () => {
               <h4 className="font-semibold mb-3">Navigation</h4>
               <ul className="space-y-2 text-sm">
                 <li><Link to="/products" className="text-slate-600 hover:text-indigo-600">Products</Link></li>
+                <li><Link to="/branches" className="text-slate-600 hover:text-indigo-600">Branches</Link></li>
               </ul>
             </div>
           </aside>
