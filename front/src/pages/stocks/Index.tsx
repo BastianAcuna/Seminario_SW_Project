@@ -66,7 +66,7 @@ export default () => {
     const createStock = async (e?: React.FormEvent) => {
         e?.preventDefault()
         if (!newStock.product_id || !newStock.branch_id) {
-            setError('Please select a product and a branch before creating stock')
+            setError('Elija una sucursal y un producto primero')
             return
         }
         try {
@@ -116,70 +116,102 @@ export default () => {
 
     return (
         <>
-            <h1 className="text-5xl">Stock</h1>
+            <div className="mb-8">
+                <h1 className="text-5xl font-bold mb-2 bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                    Stock
+                </h1>
+                <p className="text-slate-400">Gestion de inventario en sucursales</p>
+            </div>
 
-            {error && <p className="text-red-600 mt-2">{error}</p>}
+            {error && (
+                <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
+                    <p className="text-red-300 text-sm">{error}</p>
+                </div>
+            )}
 
-            <div className="m-4">
-                <form className="mb-6 max-w-xl" onSubmit={createStock}>
-                    <h2 className="text-xl mb-2">Create new stock record</h2>
-                    <div className="grid grid-cols-1 gap-2">
-                        <label className="text-sm">Product</label>
-                        <select
-                            className="border rounded px-2 py-1"
-                            value={String(newStock.product_id)}
-                            onChange={(e) => setNewStock({ ...newStock, product_id: Number(e.target.value) })}
-                        >
-                            {products.map((p) => (
-                                <option key={p.id} value={p.id}>{p.name}</option>
-                            ))}
-                        </select>
-
-                        <label className="text-sm">Branch</label>
-                        <select
-                            className="border rounded px-2 py-1"
-                            value={String(newStock.branch_id)}
-                            onChange={(e) => setNewStock({ ...newStock, branch_id: Number(e.target.value) })}
-                        >
-                            {branches.map((b) => (
-                                <option key={b.id} value={b.id}>{b.name}</option>
-                            ))}
-                        </select>
-
-                        <input
-                            className="border rounded px-2 py-1"
-                            placeholder="Amount"
-                            type="number"
-                            value={String(newStock.amount)}
-                            onChange={(e) => setNewStock({ ...newStock, amount: Number(e.target.value) })}
-                        />
+            <div className="space-y-6">
+                <form className="border border-white/10 rounded-xl p-6 bg-white/5 backdrop-blur-sm shadow-lg" onSubmit={createStock}>
+                    <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                        <span className="text-2xl">📊</span>
+                        Crear nuevo registro de stock
+                    </h2>
+                    <div className="grid grid-cols-1 gap-4">
+                        <div>
+                            <label className="text-sm text-slate-400 mb-2 block">Producto</label>
+                            <select
+                                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                                value={String(newStock.product_id)}
+                                onChange={(e) => setNewStock({ ...newStock, product_id: Number(e.target.value) })}
+                            >
+                                {products.map((p) => (
+                                    <option key={p.id} value={p.id} className="bg-slate-800">{p.name}</option>
+                                ))}
+                            </select>
+                        </div>
 
                         <div>
-                            <button className="px-3 py-1 bg-green-600 text-white rounded" type="submit">
-                                Create
+                            <label className="text-sm text-slate-400 mb-2 block">Sucursal</label>
+                            <select
+                                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                                value={String(newStock.branch_id)}
+                                onChange={(e) => setNewStock({ ...newStock, branch_id: Number(e.target.value) })}
+                            >
+                                {branches.map((b) => (
+                                    <option key={b.id} value={b.id} className="bg-slate-800">{b.name}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label className="text-sm text-slate-400 mb-2 block">Cantidad</label>
+                            <input
+                                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                                placeholder="Cantidad"
+                                type="number"
+                                value={String(newStock.amount)}
+                                onChange={(e) => setNewStock({ ...newStock, amount: Number(e.target.value) })}
+                            />
+                        </div>
+
+                        <div>
+                            <button className="px-6 py-3 bg-linear-to-r from-purple-500 to-pink-500 text-white rounded-lg font-medium hover:from-purple-600 hover:to-pink-600 transition-all shadow-lg shadow-purple-500/50" type="submit">
+                                Crear
                             </button>
                         </div>
                     </div>
                 </form>
 
-                {loading ? (
-                    <p>Loading...</p>
-                ) : stocks.length === 0 ? (
-                    <p>No stock records</p>
-                ) : (
-                    <div>
-                        {stocks.map((s) => (
-                            <Stock
-                                key={s.id}
-                                stock={s}
-                                onDelete={deleteStock}
-                                onUpdate={updateStock}
-                                productName={getProductName(s.product_id)}
-                                branchName={getBranchName(s.branch_id)}
-                            />
-                        ))}
-                    </div>
-                )}
+                <div className="mt-8">
+                    {loading ? (
+                        <div className="text-center py-12">
+                            <div className="inline-block w-12 h-12 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin"></div>
+                            <p className="text-slate-400 mt-4">Cargando registros de stock...</p>
+                        </div>
+                    ) : stocks.length === 0 ? (
+                        <div className="text-center py-12 border border-white/10 rounded-xl bg-white/5">
+                            <span className="text-6xl mb-4 block">📦</span>
+                            <p className="text-slate-400 text-lg">No hay registros de inventario aun</p>
+                            <p className="text-slate-500 text-sm mt-2">Crea el primer registro arriba</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                                <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                                Todos los registros de stock ({stocks.length})
+                            </h3>
+                            {stocks.map((s) => (
+                                <Stock
+                                    key={s.id}
+                                    stock={s}
+                                    onDelete={deleteStock}
+                                    onUpdate={updateStock}
+                                    productName={getProductName(s.product_id)}
+                                    branchName={getBranchName(s.branch_id)}
+                                />
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
         </>
     )

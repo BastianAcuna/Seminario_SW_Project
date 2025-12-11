@@ -7,6 +7,7 @@ const API_BASE = (import.meta.env.VITE_API_BASE as string) || 'http://localhost:
 export default () => {
     const [branches, setBranches] = useState<BranchType[]>([])
     const [loading, setLoading] = useState(false)
+    const [error, setError] = useState<string | null>(null)
 
     const [newBranch, setNewBranch] = useState<BranchType>({ name: '', address: '', description: '' })
 
@@ -29,6 +30,15 @@ export default () => {
 
     const createBranch = async (e?: React.FormEvent) => {
         e?.preventDefault()
+        
+        // Validation
+        if (!newBranch.name?.trim()) {
+            setError('El nombre de la sucursal es requerido')
+            return
+        }
+        
+        setError(null)
+        
         try {
             const res = await fetch(`${API_BASE}/branches`, {
                 method: 'POST',
@@ -41,6 +51,7 @@ export default () => {
             setNewBranch({ name: '', address: '', description: '' })
         } catch (err) {
             console.error(err)
+            setError('Error al crear la sucursal')
         }
     }
 
@@ -72,49 +83,77 @@ export default () => {
 
     return (
         <>
-            <h1 className="text-5xl">All branches</h1>
+            <div className="mb-8">
+                <h1 className="text-5xl font-bold mb-2 bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                    Sucursales
+                </h1>
+                <p className="text-slate-400">Gestiona las sucursales</p>
+            </div>
 
-            <div className="m-4">
-                <form className="mb-6 max-w-xl" onSubmit={createBranch}>
-                    <h2 className="text-xl mb-2">Create new branch</h2>
-                    <div className="grid grid-cols-1 gap-2">
+            <div className="space-y-6">
+                <form className="border border-white/10 rounded-xl p-6 bg-white/5 backdrop-blur-sm shadow-lg" onSubmit={createBranch}>
+                    <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                        <span className="text-2xl">🏢</span>
+                        Crear nueva sucursal
+                    </h2>
+                    
+                    {error && (
+                        <div className="mb-4 p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
+                            <p className="text-red-300 text-sm">{error}</p>
+                        </div>
+                    )}
+                    
+                    <div className="grid grid-cols-1 gap-4">
                         <input
-                            className="border rounded px-2 py-1"
-                            placeholder="Name"
+                            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                            placeholder="Nombre sucursal"
                             value={newBranch.name}
                             onChange={(e) => setNewBranch({ ...newBranch, name: e.target.value })}
                         />
                         <input
-                            className="border rounded px-2 py-1"
-                            placeholder="Address"
+                            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                            placeholder="Direccion"
                             value={newBranch.address}
                             onChange={(e) => setNewBranch({ ...newBranch, address: e.target.value })}
                         />
                         <textarea
-                            className="border rounded px-2 py-1"
-                            placeholder="Description"
+                            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all min-h-[100px]"
+                            placeholder="Descripcion"
                             value={newBranch.description}
                             onChange={(e) => setNewBranch({ ...newBranch, description: e.target.value })}
                         />
                         <div>
-                            <button className="px-3 py-1 bg-green-600 text-white rounded" type="submit">
-                                Create
+                            <button className="px-6 py-3 bg-linear-to-r from-purple-500 to-pink-500 text-white rounded-lg font-medium hover:from-purple-600 hover:to-pink-600 transition-all shadow-lg shadow-purple-500/50" type="submit">
+                                Crear
                             </button>
                         </div>
                     </div>
                 </form>
 
-                {loading ? (
-                    <p>Loading...</p>
-                ) : branches.length === 0 ? (
-                    <p>No branches</p>
-                ) : (
-                    <div>
-                        {branches.map((b) => (
-                            <Branch key={b.id} branch={b} onDelete={deleteBranch} onUpdate={updateBranch} />
-                        ))}
-                    </div>
-                )}
+                <div className="mt-8">
+                    {loading ? (
+                        <div className="text-center py-12">
+                            <div className="inline-block w-12 h-12 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin"></div>
+                            <p className="text-slate-400 mt-4">Cargando sucursales...</p>
+                        </div>
+                    ) : branches.length === 0 ? (
+                        <div className="text-center py-12 border border-white/10 rounded-xl bg-white/5">
+                            <span className="text-6xl mb-4 block">🏪</span>
+                            <p className="text-slate-400 text-lg">Aun no hay sucursales</p>
+                            <p className="text-slate-500 text-sm mt-2">Crea tu primer sucursal arriba</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                                <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                                Todas las sucursales ({branches.length})
+                            </h3>
+                            {branches.map((b) => (
+                                <Branch key={b.id} branch={b} onDelete={deleteBranch} onUpdate={updateBranch} />
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
         </>
     )
